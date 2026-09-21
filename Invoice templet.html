@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Receipt</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 3px solid #003087; }
+        .logo { max-width: 160px; margin-bottom: 10px; }
+        .phone-btn {
+            display: inline-block;
+            background-color: #0070ba;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+        .content { padding: 30px; color: #333333; line-height: 1.6; }
+        .amount-highlight { text-align: center; margin: 20px 0; }
+        .amount-highlight h1 { color: #009cde; font-size: 32px; margin: 0; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; font-size: 14px; }
+        .details-table td { padding: 10px; border-bottom: 1px solid #eeeeee; }
+        .details-table td:first-child { color: #666666; width: 40%; }
+        .details-table td:last-child { font-weight: bold; text-align: right; }
+        .qr-section { text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 6px; }
+        .footer { background-color: #f5f7fa; padding: 20px; text-align: center; font-size: 12px; color: #666666; border-top: 1px solid #dddddd; }
+        .warning-box { background-color: #fff3cd; border-left: 4px solid #ffecb5; padding: 15px; margin: 20px 0; font-size: 13px; color: #856404; }
+        .refund-box { border: 1px solid #dddddd; padding: 20px; border-radius: 4px; margin-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Company Logo" class="logo">
+        <br>
+        <a href="tel:+19097074550" class="phone-btn">Billing Team +1 909 707 4550</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h2 style="text-align: center; color: #333;">✓ Transaction Completed</h2>
+
+        <div class="amount-highlight">
+            <h1>$655.00</h1>
+            <p style="color: #666; margin-top: 5px;">The transaction of amount $655.00 is completed successfully.</p>
+        </div>
+
+        <p style="text-align: center; color: #d9534f; font-weight: bold;">⏰ Deducted amount reflects within 12 hours</p>
+
+        <!-- Bitcoin Details -->
+        <h3 style="border-bottom: 2px solid #009cde; padding-bottom: 10px; color: #003087;">₿ Bitcoin Transaction Details</h3>
+
+        <table class="details-table">
+            <tr>
+                <td>Transaction Hash</td>
+                <td>0gdnlmlgsd4614566gd</td>
+            </tr>
+            <tr>
+                <td>Wallet Address</td>
+                <td>7gsdnmylnlklfgs7665465</td>
+            </tr>
+            <tr>
+                <td>Network</td>
+                <td>Coinbase (Bitcoin)</td>
+            </tr>
+            <tr>
+                <td>Confirmations</td>
+                <td>2 confirmations (pending)</td>
+            </tr>
+            <tr>
+                <td>BTC Amount</td>
+                <td>0.02 BTC</td>
+            </tr>
+            <tr>
+                <td>Exchange Rate</td>
+                <td>1 BTC = $44,727.50 USD</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td>0.00012 BTC ($5.37)</td>
+            </tr>
+            <tr>
+                <td>Estimated Delivery</td>
+                <td>~20-40 minutes</td>
+            </tr>
+        </table>
+
+        <!-- Order Summary -->
+        <h3 style="border-bottom: 2px solid #009cde; padding-bottom: 10px; color: #003087;">Order Summary</h3>
+        <table class="details-table">
+            <thead>
+                <tr style="background-color: #f9f9f9;">
+                    <th style="text-align: left; padding: 10px;">Description</th>
+                    <th style="text-align: center; padding: 10px;">Qty</th>
+                    <th style="text-align: right; padding: 10px;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Purchase of Bitcoin via Coinbase Exchange</td>
+                    <td style="text-align: center;">1</td>
+                    <td style="text-align: right;">$655.00 USD</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right; font-weight: bold;">Subtotal:</td>
+                    <td style="text-align: right;">$655.00 USD</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right; font-weight: bold;">Tax:</td>
+                    <td style="text-align: right;">$0.00 USD</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right; font-weight: bold; color: #003087;">Total:</td>
+                    <td style="text-align: right; font-weight: bold; color: #003087;">$655.00 USD</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background-color: #e8f4fd; padding: 15px; border-radius: 4px; margin-top: 15px;">
+            <p style="margin: 0; font-weight: bold;">💳 Amount Paid: <span style="float: right;">$655.00 USD</span></p>
+            <p style="margin: 5px 0 0 0; font-weight: bold;">💼 Bitcoin Wallet Delivery: <span style="float: right;">0.02 BTC</span></p>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="qr-section">
+            <p style="margin-bottom: 10px; font-weight: bold;">Wallet Reference ID: TRC20-X8K2-9F4M-7710</p>
+            <p style="margin: 0; font-size: 14px; color: #666;">Network: Coinbase | Confirmations: 2</p>
+            <div style="margin: 15px 0;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1qj6k" alt="QR Code" style="width: 150px; height: 150px;">
+            </div>
+            <p style="font-size: 12px; color: #888;">Scan the QR code with your wallet app to track delivery.</p>
+            <p style="font-family: monospace; font-weight: bold; background: #eee; display: inline-block; padding: 5px 10px; border-radius: 4px;">bc1q...j6k</p>
+        </div>
+
+        <!-- Important Info -->
+        <div class="warning-box">
+            <strong>⚡ Important Information about your Bitcoin Purchase</strong><br><br>
+            The specified amount of Bitcoin 0.02 BTC has been successfully purchased through PayPal United States and is being processed for delivery to your designated wallet address. This process might take some time depending on blockchain network confirmations and network activity.
+        </div>
+
+        <!-- Refund Policy -->
+        <div class="refund-box">
+            <h3 style="margin-top: 0; color: #003087;">🛡 Refund Policy and Support</h3>
+            <p><strong>24-hour window</strong><br>
+            If you wish to cancel this purchase and request a refund, you may do so within 24 hours of this transaction. For assistance, please contact our US helpline.</p>
+
+            <a href="tel:+19097074550" class="phone-btn">Billing Team +1 909 707 4550</a>
+
+            <p style="font-size: 12px; color: #666; margin-top: 12px;">🇺🇸 US toll-free 24/7 – Customer Support</p>
+        </div>
+
+        <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #666;">
+            Thank you for using our service.<br>
+            The deducted amount will reflect in your bank account within 12 hours.
+        </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p style="font-weight: bold; font-size: 14px; color: #003087;">PayPal, Inc.</p>
+        <p>2211 North First Street, San Jose, CA 95131</p>
+
+        <a href="tel:+19097074550" class="phone-btn" style="margin-top: 15px;">Billing Team +1 909 707 4550</a>
+
+        <p style="margin-top: 15px; font-size: 11px; color: #999;">
+            This email was sent to you regarding your recent transaction. Please do not reply directly to this email.
+        </p>
+    </div>
+</div>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6aa8d70d9117af34473db4f7/1k2hog3no';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+
+</body>
+</html>
