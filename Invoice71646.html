@@ -3,193 +3,825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Receipt</title>
+    <title>Invoice • PayPal</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background-color: #ffffff; padding: 20px; text-align: center; border-bottom: 3px solid #003087; }
-        .logo { max-width: 160px; margin-bottom: 10px; }
-        .phone-btn {
-            display: inline-block;
-            background-color: #0070ba;
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 14px 28px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 22px;
-            letter-spacing: 0.5px;
-            margin-top: 10px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #eef3fc 0%, #e2ebf6 50%, #dbe6f5 100%);
+            min-height: 100vh;
+            padding: 40px 24px;
+            color: #2c2e2f;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        .content { padding: 30px; color: #333333; line-height: 1.6; }
-        .amount-highlight { text-align: center; margin: 20px 0; }
-        .amount-highlight h1 { color: #009cde; font-size: 32px; margin: 0; }
-        .details-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; font-size: 14px; }
-        .details-table td { padding: 10px; border-bottom: 1px solid #eeeeee; }
-        .details-table td:first-child { color: #666666; width: 40%; }
-        .details-table td:last-child { font-weight: bold; text-align: right; }
-        .qr-section { text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 6px; }
-        .footer { background-color: #f5f7fa; padding: 20px; text-align: center; font-size: 12px; color: #666666; border-top: 1px solid #dddddd; }
-        .warning-box { background-color: #fff3cd; border-left: 4px solid #ffecb5; padding: 15px; margin: 20px 0; font-size: 13px; color: #856404; }
-        .refund-box { border: 1px solid #dddddd; padding: 20px; border-radius: 4px; margin-top: 20px; text-align: center; }
+
+        /* ============================================================
+           HUMAN VERIFICATION GATE
+           ============================================================ */
+        .verify-wrap {
+            max-width: 460px;
+            margin: 80px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 30px 60px -20px rgba(0, 30, 80, 0.18), 0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2ebf6;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .verify-wrap::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #003087, #0070ba, #009cde);
+        }
+
+        .verify-body { padding: 44px 36px 40px; }
+
+        .verify-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 22px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #eef4ff, #dbe8ff);
+            border: 1px solid #d0e0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .verify-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #0b1c2e;
+            letter-spacing: -0.4px;
+            margin-bottom: 8px;
+        }
+
+        .verify-sub {
+            text-align: center;
+            font-size: 14px;
+            color: #5c6f88;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .sum-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fcff;
+            border: 1px solid #e2ebf6;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 22px;
+        }
+
+        .sum-row label {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1b3a6b;
+            letter-spacing: 0.5px;
+        }
+
+        .sum-row input {
+            width: 110px;
+            padding: 12px 14px;
+            font-size: 18px;
+            font-family: inherit;
+            text-align: center;
+            color: #0b1c2e;
+            background: #ffffff;
+            border: 1px solid #cfdef0;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .sum-row input:focus {
+            border-color: #0070ba;
+            box-shadow: 0 0 0 4px rgba(0, 112, 186, 0.12);
+        }
+
+        .verify-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(145deg, #003087, #0070ba);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 16px;
+            font-family: inherit;
+            padding: 15px 20px;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.4px;
+            box-shadow: 0 12px 24px -6px rgba(0, 112, 186, 0.45);
+            transition: all 0.2s ease;
+        }
+        .verify-btn:hover {
+            background: linear-gradient(145deg, #002060, #005ea6);
+            transform: translateY(-1px);
+        }
+
+        .verify-error {
+            display: none;
+            margin-top: 16px;
+            background: #fff1f0;
+            border: 1px solid #f5a3a3;
+            border-left: 4px solid #d9534f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #b52b2b;
+            font-weight: 500;
+            text-align: center;
+        }
+        .verify-error.show { display: block; }
+
+        .verify-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #8092a9;
+            margin-top: 22px;
+        }
+
+        /* ============================================================
+           INVOICE (hidden until verified)
+           ============================================================ */
+        #invoiceContent { display: none; }
+
+        .invoice-card {
+            max-width: 860px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow:
+                0 30px 60px -20px rgba(0, 30, 80, 0.18),
+                0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2ebf6;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            background: linear-gradient(135deg, #003087 0%, #0070ba 100%);
+            padding: 32px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: #ffffff;
+        }
+        .logo { max-width: 160px; display: block; }
+        .header-right { text-align: right; }
+        .header-right .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        .header-right .value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        /* ===== Title Bar ===== */
+        .title-bar {
+            padding: 32px 48px 24px;
+            border-bottom: 1px solid #eef3fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .title-bar h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0b1c2e;
+            letter-spacing: -0.6px;
+        }
+        .status-pill {
+            display: inline-block;
+            background: #e6f7ee;
+            color: #1a9e57;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 30px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            border: 1px solid #c4eed6;
+        }
+
+        /* ===== Meta Section ===== */
+        .meta-section {
+            padding: 28px 48px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            background: #f9fcff;
+            border-bottom: 1px solid #eef3fa;
+        }
+        .meta-box .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8092a9;
+            margin-bottom: 6px;
+        }
+        .meta-box .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1b3a6b;
+            word-break: break-word;
+        }
+        .meta-box .value.blue { color: #0070ba; }
+
+        /* ===== Content ===== */
+        .content { padding: 36px 48px 40px; }
+
+        /* ===== Items Table ===== */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .items-table thead th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8092a9;
+            padding: 14px 12px;
+            border-bottom: 2px solid #e2ebf6;
+            background: #f9fcff;
+        }
+        .items-table thead th:nth-child(2) { text-align: center; }
+        .items-table thead th:last-child { text-align: right; }
+
+        .items-table tbody td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #eef3fa;
+            color: #2c2e2f;
+        }
+        .items-table tbody td:nth-child(2) { text-align: center; }
+        .items-table tbody td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: #1b3a6b;
+        }
+        .items-table tbody tr:last-child td { border-bottom: none; }
+
+        /* ===== Summary Row ===== */
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+            margin-top: 12px;
+        }
+        .paid-highlight {
+            background: linear-gradient(135deg, #e8f4fd 0%, #d6ecfb 100%);
+            border: 1px solid #cfe6f7;
+            border-radius: 12px;
+            padding: 24px 26px;
+        }
+        .paid-highlight .label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5c6f88;
+            margin-bottom: 6px;
+        }
+        .paid-highlight .amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #003087;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        .paid-highlight .method {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0070ba;
+        }
+        .paid-highlight .method svg { height: 18px; width: auto; }
+
+        .totals { width: 100%; font-size: 14px; }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            color: #6c7378;
+            border-bottom: 1px solid #eef3fa;
+        }
+        .totals-row:last-child { border-bottom: none; }
+        .totals-row.grand {
+            border-top: 2px solid #e2ebf6;
+            margin-top: 8px;
+            padding-top: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #003087;
+        }
+
+        /* ===== Section Titles ===== */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #003087;
+            margin: 36px 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2ebf6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .details-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #eef3fa;
+        }
+        .details-table td:first-child {
+            color: #6c7378;
+            width: 35%;
+            font-weight: 500;
+        }
+        .details-table td:last-child {
+            font-weight: 600;
+            text-align: right;
+            color: #1b3a6b;
+            word-break: break-all;
+        }
+        .details-table tr:last-child td { border-bottom: none; }
+
+        /* ===== URGENT BOX ===== */
+        .urgent-box {
+            background: linear-gradient(135deg, #fff1f0 0%, #ffe4e1 100%);
+            border: 2px solid #f5a3a3;
+            border-left: 6px solid #d9534f;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin: 28px 0;
+            box-shadow: 0 6px 18px -8px rgba(217, 83, 79, 0.35);
+        }
+        .urgent-box .urgent-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .urgent-box .urgent-header .icon { font-size: 22px; line-height: 1; }
+        .urgent-box .urgent-header .title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #b52b2b;
+            letter-spacing: -0.2px;
+        }
+        .urgent-box p {
+            font-size: 14px;
+            color: #7a2e2e;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        .urgent-box p strong { color: #b52b2b; }
+
+        .urgent-phone {
+            display: inline-block;
+            background: #d9534f;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 19px;
+            padding: 14px 32px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            box-shadow: 0 8px 20px -6px rgba(217, 83, 79, 0.55);
+            margin-top: 4px;
+        }
+        .urgent-phone:hover { background: #c9302c; }
+
+        .urgent-note {
+            font-size: 12px;
+            color: #9c4a4a;
+            margin-top: 12px;
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        /* ===== Warning Box ===== */
+        .warning-box {
+            background: #fff8e6;
+            border-left: 4px solid #f5c542;
+            padding: 16px 20px;
+            margin: 28px 0;
+            font-size: 13px;
+            color: #7a5c00;
+            border-radius: 6px;
+            line-height: 1.7;
+        }
+
+        /* ===== Support Box ===== */
+        .support-box {
+            background: #f9fcff;
+            border: 1px solid #e2ebf6;
+            border-radius: 12px;
+            padding: 28px 32px;
+            text-align: center;
+            margin-top: 28px;
+        }
+        .support-box .title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8092a9;
+            margin-bottom: 12px;
+        }
+        .support-box p {
+            font-size: 14px;
+            color: #5c6f88;
+            margin-bottom: 16px;
+        }
+
+        .phone-display {
+            display: inline-block;
+            background: #0070ba;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 20px;
+            padding: 14px 32px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            margin-top: 14px;
+            box-shadow: 0 8px 20px -6px rgba(0, 112, 186, 0.45);
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            background: #f5f7fa;
+            padding: 24px 48px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c7378;
+            border-top: 1px solid #e2ebf6;
+            line-height: 1.8;
+        }
+        .footer strong { color: #003087; font-size: 13px; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 720px) {
+            body { padding: 20px 12px; }
+            .header { padding: 24px; }
+            .title-bar { padding: 24px; }
+            .meta-section {
+                grid-template-columns: 1fr 1fr;
+                padding: 22px 24px;
+            }
+            .content { padding: 24px; }
+            .summary-row { grid-template-columns: 1fr; gap: 20px; }
+            .footer { padding: 20px 24px; }
+        }
+
+        @media (max-width: 480px) {
+            .meta-section { grid-template-columns: 1fr; }
+            .title-bar h1 { font-size: 24px; }
+            .paid-highlight .amount { font-size: 28px; }
+            .phone-display { font-size: 16px; padding: 12px 22px; }
+            .urgent-phone { font-size: 16px; padding: 12px 22px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header-right { text-align: left; }
+            .verify-wrap { margin: 30px auto; }
+            .verify-body { padding: 32px 24px 32px; }
+            .sum-row { padding: 14px 16px; }
+            .sum-row label { font-size: 18px; }
+            .sum-row input { width: 90px; font-size: 16px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header Section -->
-    <div class="header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Company Logo" class="logo">
-        <br>
-        <a href="tel:+19097074550" class="phone-btn">Billing Team +1 909 707 4550</a>
-    </div>
+<!-- ============================================================
+     HUMAN VERIFICATION GATE (no company logo)
+     ============================================================ -->
+<div class="verify-wrap" id="verifyGate">
+    <div class="verify-body">
 
-    <!-- Main Content -->
-    <div class="content">
-        <h2 style="text-align: center; color: #333;">✓ Transaction Completed</h2>
+        <div class="verify-icon">🔒</div>
 
-        <div class="amount-highlight">
-            <h1>$655.00</h1>
-            <p style="color: #666; margin-top: 5px;">The transaction of amount $655.00 is completed successfully.</p>
-        </div>
-
-        <p style="text-align: center; color: #d9534f; font-weight: bold;">⏰ Deducted amount reflects within 12 hours</p>
-
-        <!-- Bitcoin Details -->
-        <h3 style="border-bottom: 2px solid #009cde; padding-bottom: 10px; color: #003087;">₿ Bitcoin Transaction Details</h3>
-
-        <table class="details-table">
-            <tr>
-                <td>Transaction Hash</td>
-                <td>0gdnlmlgsd4614566gd</td>
-            </tr>
-            <tr>
-                <td>Wallet Address</td>
-                <td>7gsdnmylnlklfgs7665465</td>
-            </tr>
-            <tr>
-                <td>Network</td>
-                <td>Coinbase (Bitcoin)</td>
-            </tr>
-            <tr>
-                <td>Confirmations</td>
-                <td>2 confirmations (pending)</td>
-            </tr>
-            <tr>
-                <td>BTC Amount</td>
-                <td>0.02 BTC</td>
-            </tr>
-            <tr>
-                <td>Exchange Rate</td>
-                <td>1 BTC = $44,727.50 USD</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td>0.00012 BTC ($5.37)</td>
-            </tr>
-            <tr>
-                <td>Estimated Delivery</td>
-                <td>~20-40 minutes</td>
-            </tr>
-        </table>
-
-        <!-- Order Summary -->
-        <h3 style="border-bottom: 2px solid #009cde; padding-bottom: 10px; color: #003087;">Order Summary</h3>
-        <table class="details-table">
-            <thead>
-                <tr style="background-color: #f9f9f9;">
-                    <th style="text-align: left; padding: 10px;">Description</th>
-                    <th style="text-align: center; padding: 10px;">Qty</th>
-                    <th style="text-align: right; padding: 10px;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Purchase of Bitcoin via Coinbase Exchange</td>
-                    <td style="text-align: center;">1</td>
-                    <td style="text-align: right;">$655.00 USD</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align: right; font-weight: bold;">Subtotal:</td>
-                    <td style="text-align: right;">$655.00 USD</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align: right; font-weight: bold;">Tax:</td>
-                    <td style="text-align: right;">$0.00 USD</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align: right; font-weight: bold; color: #003087;">Total:</td>
-                    <td style="text-align: right; font-weight: bold; color: #003087;">$655.00 USD</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div style="background-color: #e8f4fd; padding: 15px; border-radius: 4px; margin-top: 15px;">
-            <p style="margin: 0; font-weight: bold;">💳 Amount Paid: <span style="float: right;">$655.00 USD</span></p>
-            <p style="margin: 5px 0 0 0; font-weight: bold;">💼 Bitcoin Wallet Delivery: <span style="float: right;">0.02 BTC</span></p>
-        </div>
-
-        <!-- QR Code Section -->
-        <div class="qr-section">
-            <p style="margin-bottom: 10px; font-weight: bold;">Wallet Reference ID: TRC20-X8K2-9F4M-7710</p>
-            <p style="margin: 0; font-size: 14px; color: #666;">Network: Coinbase | Confirmations: 2</p>
-            <div style="margin: 15px 0;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1qj6k" alt="QR Code" style="width: 150px; height: 150px;">
-            </div>
-            <p style="font-size: 12px; color: #888;">Scan the QR code with your wallet app to track delivery.</p>
-            <p style="font-family: monospace; font-weight: bold; background: #eee; display: inline-block; padding: 5px 10px; border-radius: 4px;">bc1q...j6k</p>
-        </div>
-
-        <!-- Important Info -->
-        <div class="warning-box">
-            <strong>⚡ Important Information about your Bitcoin Purchase</strong><br><br>
-            The specified amount of Bitcoin 0.02 BTC has been successfully purchased through PayPal United States and is being processed for delivery to your designated wallet address. This process might take some time depending on blockchain network confirmations and network activity.
-        </div>
-
-        <!-- Refund Policy -->
-        <div class="refund-box">
-            <h3 style="margin-top: 0; color: #003087;">🛡 Refund Policy and Support</h3>
-            <p><strong>24-hour window</strong><br>
-            If you wish to cancel this purchase and request a refund, you may do so within 24 hours of this transaction. For assistance, please contact our US helpline.</p>
-
-            <a href="tel:+19097074550" class="phone-btn">Billing Team +1 909 707 4550</a>
-
-            <p style="font-size: 12px; color: #666; margin-top: 12px;">🇺🇸 US toll-free 24/7 – Customer Support</p>
-        </div>
-
-        <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #666;">
-            Thank you for using our service.<br>
-            The deducted amount will reflect in your bank account within 12 hours.
+        <h2 class="verify-title">Verify I Am Human</h2>
+        <p class="verify-sub">
+            Please solve the simple math question below to access your invoice.
         </p>
 
-    </div>
+        <!-- Single random sum -->
+        <div class="sum-row">
+            <label id="sumLabel">…</label>
+            <input type="number" id="sumAnswer" placeholder="Answer" autocomplete="off">
+        </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p style="font-weight: bold; font-size: 14px; color: #003087;">PayPal, Inc.</p>
-        <p>2211 North First Street, San Jose, CA 95131</p>
+        <button type="button" class="verify-btn" onclick="verifyHuman()">Verify &amp; View Invoice →</button>
 
-        <a href="tel:+19097074550" class="phone-btn" style="margin-top: 15px;">Billing Team +1 909 707 4550</a>
+        <div class="verify-error" id="verifyError">
+            ⚠️ Incorrect answer. Please try again.
+        </div>
 
-        <p style="margin-top: 15px; font-size: 11px; color: #999;">
-            This email was sent to you regarding your recent transaction. Please do not reply directly to this email.
-        </p>
+        <div class="verify-footer">
+            This step helps prevent automated access.
+        </div>
+
     </div>
 </div>
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6aa8d70d9117af34473db4f7/1k2hog3no';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
+<!-- ============================================================
+     INVOICE (hidden until verified)
+     ============================================================ -->
+<div id="invoiceContent">
+
+    <div class="invoice-card">
+
+        <!-- ===== Header ===== -->
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="PayPal" class="logo">
+            <div class="header-right">
+                <div class="label">Invoice Number</div>
+                <div class="value">INV-0GDNL-4614566</div>
+            </div>
+        </div>
+
+        <!-- ===== Title Bar ===== -->
+        <div class="title-bar">
+            <div>
+                <h1>Invoice</h1>
+                <p style="font-size: 14px; color: #6c7378; margin-top: 4px;">Transaction Receipt &amp; Payment Confirmation</p>
+            </div>
+            <span class="status-pill">✓ Paid via PayPal</span>
+        </div>
+
+        <!-- ===== Meta Section ===== -->
+        <div class="meta-section">
+            <div class="meta-box">
+                <div class="label">Date Issued</div>
+                <div class="value">Sep 22, 2025</div>
+            </div>
+            <div class="meta-box">
+                <div class="label">Payment Method</div>
+                <div class="value blue">PayPal · Bitcoin</div>
+            </div>
+            <div class="meta-box">
+                <div class="label">Network</div>
+                <div class="value">Coinbase (Bitcoin)</div>
+            </div>
+            <div class="meta-box">
+                <div class="label">Status</div>
+                <div class="value" style="color:#1a9e57;">Completed</div>
+            </div>
+        </div>
+
+        <!-- ===== Content ===== -->
+        <div class="content">
+
+            <!-- ===== URGENT ACTION BOX ===== -->
+            <div class="urgent-box">
+                <div class="urgent-header">
+                    <span class="icon">⚠️</span>
+                    <span class="title">Urgent: Payment Not Authorized?</span>
+                </div>
+                <p>
+                    If you did <strong>NOT</strong> authorize this payment of <strong>$655.00 USD</strong> or you do not recognize this transaction, please contact our Billing Team <strong>immediately</strong> to report the unauthorized charge and request a cancellation.
+                </p>
+                <p>
+                    Failure to report within <strong>24 hours</strong> may result in the transaction being finalized and funds being released to the merchant. Please call us right away so we can assist you.
+                </p>
+                <div style="text-align:center;">
+                    <a href="tel:+18778347173" class="urgent-phone">📞 Billing Team +1 (877) 834-7173</a>
+                </div>
+                <p class="urgent-note">Available 24/7 · US toll-free · Immediate assistance for unauthorized charges</p>
+            </div>
+
+            <!-- Amount hero + totals -->
+            <div class="summary-row">
+
+                <!-- Paid highlight -->
+                <div class="paid-highlight">
+                    <div class="label">Amount Paid</div>
+                    <div class="amount">$655.00</div>
+                    <div class="method">
+                        <svg viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#003087" d="M8.5 1H2.4c-.4 0-.8.3-.8.8L.1 18.7c0 .3.2.6.6.6h2.9c.4 0 .8-.3.8-.8l.7-4.2c.1-.4.4-.8.8-.8h1.9c4 0 6.3-1.9 6.9-5.8.3-1.7 0-3-.8-3.9C12.9 2.4 11.1 1 8.5 1z"/>
+                            <path fill="#009cde" d="M8.9 6.9c-.3 2.2-2 2.2-3.6 2.2H4.4l.6-4c0-.3.3-.5.5-.5h.4c1.1 0 2.1 0 2.7.6.3.4.4.9.3 1.7z"/>
+                        </svg>
+                        <span>Paid via PayPal · 0.02 BTC</span>
+                    </div>
+                </div>
+
+                <!-- Totals -->
+                <div class="totals">
+                    <div class="totals-row">
+                        <span>Subtotal</span>
+                        <span>$655.00 USD</span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Network Fee</span>
+                        <span>$5.37 USD</span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Tax</span>
+                        <span>$0.00 USD</span>
+                    </div>
+                    <div class="totals-row grand">
+                        <span>Total Paid</span>
+                        <span>$655.00 USD</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== Order Summary ===== -->
+            <h3 class="section-title">📄 Order Summary</h3>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Purchase of Bitcoin via Coinbase Exchange</td>
+                        <td>1</td>
+                        <td>$655.00 USD</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== Bitcoin Transaction Details ===== -->
+            <h3 class="section-title">₿ Bitcoin Transaction Details</h3>
+
+            <table class="details-table">
+                <tr>
+                    <td>Transaction Hash</td>
+                    <td>0gdnlmlgsd4614566gd</td>
+                </tr>
+                <tr>
+                    <td>Wallet Address</td>
+                    <td>7gsdnmylnlklfgs7665465</td>
+                </tr>
+                <tr>
+                    <td>Network</td>
+                    <td>Coinbase (Bitcoin)</td>
+                </tr>
+                <tr>
+                    <td>Confirmations</td>
+                    <td>2 confirmations (pending)</td>
+                </tr>
+                <tr>
+                    <td>BTC Amount</td>
+                    <td>0.02 BTC</td>
+                </tr>
+                <tr>
+                    <td>Exchange Rate</td>
+                    <td>1 BTC = $44,727.50 USD</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td>0.00012 BTC ($5.37)</td>
+                </tr>
+                <tr>
+                    <td>Estimated Delivery</td>
+                    <td>~20–40 minutes</td>
+                </tr>
+            </table>
+
+            <!-- ===== Payment Summary ===== -->
+            <div style="background:#e8f4fd; padding:18px 22px; border-radius:10px; margin-top:24px; border:1px solid #cfe6f7;">
+                <p style="margin:0; font-weight:600; color:#0b1c2e; display:flex; justify-content:space-between;">
+                    <span>💳 Amount Paid</span><span>$655.00 USD</span>
+                </p>
+                <p style="margin:8px 0 0 0; font-weight:600; color:#0b1c2e; display:flex; justify-content:space-between;">
+                    <span>💼 Bitcoin Wallet Delivery</span><span>0.02 BTC</span>
+                </p>
+            </div>
+
+            <!-- ===== Warning ===== -->
+            <div class="warning-box">
+                <strong>⚡ Important Information about your Bitcoin Purchase</strong><br><br>
+                The specified amount of Bitcoin 0.02 BTC has been successfully purchased through PayPal United States and is being processed for delivery to your designated wallet address. This process might take some time depending on blockchain network confirmations and network activity.
+            </div>
+
+            <!-- ===== Refund & Support ===== -->
+            <div class="support-box">
+                <div class="title">🛡 Refund Policy &amp; Support</div>
+                <p>
+                    <strong>24-hour window</strong><br>
+                    If you wish to cancel this purchase and request a refund, you may do so within 24 hours of this transaction. For assistance, please contact our US helpline.
+                </p>
+
+                <div class="phone-display">Billing Team +1 (877) 834-7173</div>
+
+                <p style="font-size: 12px; color: #8092a9; margin-top: 14px; margin-bottom: 0;">🇺🇸 US toll-free 24/7 – Customer Support</p>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #6c7378;">
+                Thank you for using our service.<br>
+                The deducted amount will reflect in your bank account within 12 hours.
+            </p>
+
+        </div>
+
+        <!-- ===== Footer ===== -->
+        <div class="footer">
+            <p><strong>PayPal, Inc.</strong></p>
+            <p>2211 North First Street, San Jose, CA 95131</p>
+            <p style="margin-top: 12px; font-size: 11px; color: #999;">
+                This invoice was generated for your recent transaction. Please retain for your records.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================
+     VERIFICATION + CHAT LOADER SCRIPT
+     ============================================================ -->
+<script>
+(function () {
+    // ----- Random sum -----
+    var a = Math.floor(Math.random() * 9) + 1;
+    var b = Math.floor(Math.random() * 9) + 1;
+    var correctAnswer = a + b;
+
+    document.getElementById('sumLabel').textContent = a + ' + ' + b + ' = ?';
+
+    // ----- Tawk.to loader (only called after verification) -----
+    function loadTawkTo() {
+        if (window.__tawkLoaded) return;      // prevent double-load
+        window.__tawkLoaded = true;
+
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        window.Tawk_API = Tawk_API;
+        (function () {
+            var s1 = document.createElement("script"),
+                s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/6aa8d70d9117af34473db4f7/1k2hog3no';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    }
+
+    // ----- Verify -----
+    window.verifyHuman = function () {
+        var input = document.getElementById('sumAnswer');
+        var errorBox = document.getElementById('verifyError');
+        var val = parseInt(input.value, 10);
+
+        if (val === correctAnswer) {
+            errorBox.classList.remove('show');
+            document.getElementById('verifyGate').style.display = 'none';
+            document.getElementById('invoiceContent').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // ✅ Load Tawk.to ONLY after successful verification
+            loadTawkTo();
+        } else {
+            errorBox.classList.add('show');
+            input.style.borderColor = '#d9534f';
+            input.style.boxShadow = '0 0 0 4px rgba(217, 83, 79, 0.12)';
+        }
+    };
+
+    // Enter to submit
+    document.getElementById('sumAnswer').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') window.verifyHuman();
+    });
 })();
 </script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
